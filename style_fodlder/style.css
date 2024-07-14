@@ -1,0 +1,16 @@
+body {
+    margin: 0px;
+}
+
+a {
+    list-style: none;
+    color: black;
+}
+
+.manu {
+    display: flex;
+    justify-content: none;
+    width: 100%;
+    padding: 10px;
+}
+
