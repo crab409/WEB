@@ -45,7 +45,6 @@ h4 {
 
 #header .manu {
     display: flex;
-    padding-left: 20px;
     justify-content: space-between;
 }
 
