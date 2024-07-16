@@ -8,6 +8,10 @@ a{
     text-decoration-line: none;
 }
 
+h4 {
+    margin-bottom: 0px;
+}
+
 /* header tag */
 #header {
     margin-top: 30px;
@@ -56,10 +60,34 @@ a{
 }
 
 #main .main {
+    padding-top: 20px;
+    padding-bottom: 50px;
     margin-left: 25px   ;
 }
 
 /* footer tag */
 #footer {
-    background-color: rgb(126, 126, 126);
+    display: flex;
+    background-color: rgb(226, 226, 226);
+    padding-top: 20px;
+    padding-bottom: 50px;
+    color:rgb(105, 105, 105);
+}
+
+#footer a {
+    color: rgb(105, 105, 105);
+}
+
+#footer div {
+    margin-left: 40px;
+}
+
+#footer h1 {
+    margin-bottom: 5px;
+}
+
+#footer .multi_personal_info {
+    list-style: none;
+    display: flex;
+    margin-top: 20px;
 }
