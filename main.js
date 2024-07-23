@@ -4,6 +4,7 @@ var url = require('url');
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
+    var qureryData = url.parse(_url, true).query;
     if(_url == '/'){
         _url = '/home.html';
     }
