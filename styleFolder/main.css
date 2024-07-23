@@ -1,0 +1,11 @@
+#main {
+    display: grid;
+    grid-template-columns: 2fr 7fr;
+}
+
+#main .side_bar {
+    border-right: 1px rgb(126, 126, 126) solid;
+}
+#main .main {
+    margin: 0px;
+}
