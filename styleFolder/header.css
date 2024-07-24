@@ -33,3 +33,15 @@
     padding-left: 20px;
     justify-content: space-between;
 }
+
+#header .manu li:hover a{
+    color: #426eff;
+    transition: 0.5s;
+    list-style-type: disc;
+}
+
+#header .manu li:hover {
+    color: #426eff;
+    transition: 0.5s;
+    list-style-type: disc;
+}
