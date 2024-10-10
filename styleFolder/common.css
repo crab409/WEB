@@ -10,3 +10,9 @@ a{
 h4 {
     margin-bottom: 0px;
 }
+
+#main .jumbo h1 {
+    color: aliceblue;
+    margin-top: 0%;
+    padding-bottom: 2%;
+}
