@@ -20,6 +20,23 @@ new MongoClient(url).connect().then((client)=>{
     console.log(err)
 })
 
-app.get('/', (requ, resp) => {
-    resp.render('index.ejs')
+app.get('/', async (requ, resp) => {
+    let noticeDataSet = await db.collection('notice').find().toArray()
+    resp.render('index.ejs', {noticeData: noticeDataSet})
+})
+
+app.get('/problem', (requ, resp) => {
+    resp.render('problem.ejs')
+})
+
+app.get('/content', (requ, resp) => {
+    resp.render('content.ejs')
+})
+
+app.get('/ranking', (requ, resp) => {
+    resp.render('ranking.ejs')
+})
+
+app.get('/aiClass', (requ, resp) => {
+    resp.render('/aiClass.ejs')
 })
