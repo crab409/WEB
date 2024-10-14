@@ -1,0 +1,102 @@
+a{
+    color: rgb(28, 28, 28);
+    text-decoration-line: none;
+}
+
+ul {
+    list-style-type: none;
+}
+
+#base-header {
+    margin-top:1%;
+    border-bottom: 1px rgb(128, 128, 128) solid;
+    display: grid;
+    grid-template-columns: 2fr 7fr;
+    padding-bottom: 2%;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#base-header .logo {
+    padding-left: 25%;
+    align-items: center;
+}
+
+#base-header .logo h1 {
+    margin-bottom: 2%;
+    font-size: 40px;
+}
+
+#base-header .manu {
+    display: flex;
+    padding-top: 2.5%;
+    padding-left: 2%;
+    font-size:33px;
+    justify-content: space-between;
+}
+
+#base-header ul {
+    display: flex;
+    padding: 0px;
+    margin-top: 1.2%;
+}
+
+#base-header li {
+    padding-right: 45px;
+}
+
+#base-header .manu li:hover a{
+    color: #426eff;
+    transition: 0.5s;
+    list-style-type: disc;
+}
+
+#base-header .manu li:hover {
+    color: #426eff;
+    transition: 0.5s;
+    list-style-type: disc;
+}
+
+#base-main {
+    display: grid;
+    grid-template-columns: 2fr 7fr;
+}
+
+#base-main .side-bar {
+    border-right: 1px rgb(126, 126, 126) solid;
+}
+
+#base-main .main {
+    margin: 0px;
+}
+
+#base-main .jumbo {
+    padding-top: 1%;
+    padding-left: 3%;
+    padding-right: 5%;
+    padding-bottom: 3%;
+    background-color: rgb(132, 132, 132);
+    color: aliceblue;
+}
+
+#base-footer {
+    background-color: rgb(226, 226, 226);
+    padding-bottom: 30%;
+    padding-top: 20px;
+    display: flex;
+    color: rgb(140, 140, 140);
+}
+
+#base-footer div { 
+    margin-left: 40px;
+}
+
+#base-footer h1 {
+    margin-bottom: 5px;
+}
+
+#base-footer .multi_personal_info {
+    list-style: none;
+    display: flex;
+    margin-top: 20px;
+}
