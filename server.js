@@ -7,6 +7,7 @@ app.set('view engine', 'ejs');
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+//mongoDB 데이터 베이스와 연결하는 코드
 let db;
 const url = 'mongodb+srv://admin:PShQ3j41X7AlqfHb@alz.2jxno.mongodb.net/?retryWrites=true&w=majority&appName=alz';
 new MongoClient(url).connect().then((client)=>{
@@ -15,11 +16,12 @@ new MongoClient(url).connect().then((client)=>{
     app.listen(8080, () => { 
         console.log('http://localhost:8080 에서 서버 실행중')
     })
-
 }).catch((err)=>{
     console.log(err)
 })
 
+
+//링크 입력하면 해당 자료 보내주는 코드
 app.get('/', async (requ, resp) => {
     let noticeDataSet = await db.collection('notice').find().toArray()
     resp.render('index.ejs', {noticeData: noticeDataSet})
