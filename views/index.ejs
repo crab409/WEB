@@ -44,10 +44,15 @@
                     <div class="state">
                         <h2>lv. Nan</h2>
                         <p>퀘스트</p>
-                    </div>
+                    </div> 
                     <div class="notice">
                         <h2>공지</h2>
-                        <p>Naaaaaan</p>
+                        <p>
+                            <% for(let i=0; ((i<noticeData.length) && (i<4)); i++) { %>
+                                <p><strong><%= JSON.stringify(noticeData[i].title ) %></strong></p>
+                                <p><%= JSON.stringify(noticeData[i].content ) %> </p>
+                            <% } %>
+                        </p>
                     </div>
                 </div>
             </div>

@@ -27,7 +27,8 @@ app.get('/', async (requ, resp) => {
     resp.render('index.ejs', {noticeData: noticeDataSet})
 })
 
-app.get('/problem', (requ, resp) => {
+app.get('/problem', async (requ, resp) => {
+    let problemDataSet = await db.collection('problem').find().toArray()
     resp.render('problem.ejs')
 })
 
@@ -40,9 +41,9 @@ app.get('/ranking', (requ, resp) => {
 })
 
 app.get('/aiClass', (requ, resp) => {
-    resp.render('/aiClass.ejs')
+    resp.render('aiClass.ejs')
 })
 
 app.get('/aiCreater', (requ, resp) => {
-    resp.render('/aiCreater.ejs')
+    resp.render('aiCreater.ejs')
 })
