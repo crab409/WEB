@@ -40,9 +40,9 @@ app.get('/ranking', (requ, resp) => {
 })
 
 app.get('/aiClass', (requ, resp) => {
-    resp.render('/aiClass.ejs')
+    resp.render('aiClass.ejs')
 })
 
 app.get('/aiCreater', (requ, resp) => {
-    resp.render('/aiCreater.ejs')
+    resp.render('aiCreater.ejs')
 })
