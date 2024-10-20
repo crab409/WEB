@@ -1,0 +1,25 @@
+<div id="base-header">
+    <div class="logo">
+        <a href='/'><h1>ALZ</h1><h2>ALZ</h2></a>
+        <strong>쉽고 빠른 코딩 학습</strong>
+    </div>
+    <div class="manu">
+        <strong>
+            <ul>
+                <li><a href="/problem">문제</a></li>
+                <li><a href="/content">컨텐츠</a></li>
+                <li><a href="/ranking">랭킹</a></li>
+                <li><a href="/aiClass">AI 맞춤학습</a></li>
+            </ul>
+        </strong>
+        <div>
+            <a href="/account">
+                <% if (userData!=null) { %>
+                    <%- JSON.stringify(userData.username) %>
+                <% } else { %>
+                    My Account
+                <% } %>    
+            </a>
+        </div>
+    </div>
+</div>

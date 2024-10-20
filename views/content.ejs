@@ -4,28 +4,9 @@
         <title></title>
         <meta charset="utf-8">
         <link rel="stylesheet" href="/css/baseCss.css">
-        <link rel="stylesheet" href="/css/homePage.css">
     </head>
     <body>
-        <div id="base-header">
-            <div class="logo">
-                <h1><a href='/'>Class Code</a></h1>
-                쉽고 빠른 코딩 학습
-            </div>
-            <div class="manu">
-                <strong>
-                    <ul>
-                        <li><a href="/problem">문제</a></li>
-                        <li><a href="/content">컨텐츠</a></li>
-                        <li><a href="/ranking">랭킹</a></li>
-                        <li><a href="/aiClass">AI 맞춤학습</a></li>
-                    </ul>
-                </strong>
-                <div>
-                    <a href="/account">My account</a>
-                </div>
-            </div>
-        </div>
+        <%- include('blockHeader.ejs') %>
 
 
         <div id="base-main">
@@ -34,19 +15,11 @@
             </div>
             <div class="main">
                 <div class="jumbo"><h2>콘텐츠</h2></div>
-                <div class="container"></div>
+                <div class="container">추후 서비스 예정</div>
             </div>
         </div>
 
 
-        <div id="base-footer">
-            <div>
-                <h1>Class Code</h1>
-                쉽고 빠른 코딩 학습
-            </div>
-            <ul class="multi_personal_info">
-                <script src="/javaScript/developer_info.js"></script>
-            </ul>
-        </div>
+        <%- include('blockFooter.ejs') %>
     </body>
 </html>

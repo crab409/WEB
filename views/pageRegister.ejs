@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/css/baseCss.css">
+    </head>
+    <body>
+        <%- include('blockHeader.ejs') %>
+
+
+        <div id="base-main">
+            <div class="side-bar">
+                this is side bar
+            </div>
+            <div class="main">
+                <div class="jumbo"><h2>Sing Up</h2></div>
+                <div class="container">
+                    <form class="form-box" action="/register" method="POST">
+                        <h4>가입</h4>
+                        <input name="username">
+                        <input name="password" type="password">
+                        <button type="submit">전송</button>
+                    </form> 
+                </div>
+            </div>
+        </div>
+
+
+        <%- include('blockFooter.ejs') %>
+    </body>
+</html>
