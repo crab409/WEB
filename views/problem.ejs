@@ -14,8 +14,17 @@
                 this is side bar
             </div>
             <div class="main">
-                <div class="jumbo"><h2>문제집</h2></div>
-                <div class="container"></div>
+                <div class="jumbo"><h2>문제 리스트</h2></div>
+                <div class="container">
+                    <ul class="problemList">
+                        <% for(let i=0; i<dataSet.length; i++) { %>
+                            <li class="list-box"><a href="/problem/<%= dataSet[i]._id %>">
+                                <%= JSON.stringify(dataSet[i].number) %>
+                                <%= JSON.stringify(dataSet[i].title) %>
+                            </a></li>
+                        <% } %>
+                    </ul>
+                </div>
             </div>
         </div>
 

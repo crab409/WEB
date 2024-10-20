@@ -17,6 +17,8 @@ const MongoStore = require('connect-mongo')
 //정보를 암호화(해싱) 해주는 npm 라이브러리 가져오기
 const bcrypt = require('bcrypt')
 
+// #핵심부품
+const { callChatGPT } = require('./public/javaScript/chatGptProblemCreate');
 
 
 //미들웨어나 설정을 등록 뭐시기
@@ -111,7 +113,7 @@ passport.serializeUser((user, done) => {
         done(null, {
             id: user._id,
             username: user.username,
-            cleareCount: user.cleareCount
+            clearCount: user.clearCount
         })
     })
 })
@@ -128,16 +130,17 @@ passport.deserializeUser( async (user, done) => {
 
 /**
  * '/ranking'에서 쓰일 데이터 정렬 함수
+ * peoplesData에서 clearCount의 
  * 
  * bubble정렬 알고리즘 사용, 연산속도 느림 
  * ( 연산횟수 N^2, 전교 1, 2학년(400명)을 대상으로 대략 0.1초 연산 예상)
- * -추후 정렬 알고리즘 수정
  * 
+ * todo - 추후 정렬 알고리즘 수정하기
  */
 const peopleDataSort = function(dataSet) {
     for(let i=0; i<dataSet.length; i++) {
         for(let j=0; j<(dataSet.length)-1-i; j++) {
-            if(dataSet[j].cleareCount < dataSet[j+1].cleareCount) {
+            if(dataSet[j].clearCount < dataSet[j+1].clearCount) {
                 let temp = dataSet[j];
                 dataSet[j] = dataSet[j+1];
                 dataSet[j+1] = temp;
@@ -151,7 +154,7 @@ const peopleDataSort = function(dataSet) {
 
 //링크 입력하면 해당 자료 보내주는 코드
 app.get('/', async (requ, resp) => {
-    console.log(requ.user)
+    //console.log(callChatGPT("다람쥐 챗바퀴 타고파"))
 
     let userData = undefined
     if (requ.user==undefined) {
@@ -180,7 +183,32 @@ app.get('/problem', async (requ, resp) => {
     }
 
     let problemDataSet = await db.collection('problem').find().toArray()
+    console.log(problemDataSet)
     resp.render('problem.ejs', {dataSet : problemDataSet, userData:userData})
+})
+
+app.get('/problem/:id', async (req, res) => {
+    try {
+
+        let sibal = await db.collection('problem').findOne({ _id : new ObjectId(req.params.id)})
+        
+        let userData = undefined
+        if (req.user==undefined) {
+            userData = null
+            res.send("logIn 이후 사용가능한 서비스입니다.")
+        } else if (req.user != undefined){ 
+            userData = {
+                id: req.user.id,
+                username: req.user.username
+            }
+            res.render('pageOneProblem.ejs', {dataSet: sibal, userData: userData})
+        }
+
+        
+    } catch(e) {
+        console.log(e)
+        res.send("url 입력중 버그 발생")
+    }
 })
 
 app.get('/content', (requ, resp) => {
@@ -240,7 +268,8 @@ app.get('/account', (requ, resp) => {
     } else if (requ.user != undefined){ 
         userData = {
             id: requ.user.id,
-            username: requ.user.username
+            username: requ.user.username,
+            clearCount: clearCount
         }
     }   
 
@@ -268,7 +297,7 @@ app.get('/register', (requ, resp) => {
 })
 
 app.get('/aiCreater', (requ, resp) => {
-    resp.render('aiCreater.ejs')
+    resp.render('pageAiCreater.ejs')
 })
 
 
@@ -293,7 +322,7 @@ app.post('/register', async (requ, resp, next) => {
     await db.collection('user').insertOne({
         username: requ.body.username,
         password: requ.body.password,
-        cleareCount: 0
+        clearCount: 0
     })
 
     passport.authenticate('local', (error, user, info) => {
