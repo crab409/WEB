@@ -5,9 +5,6 @@
         <meta charset="utf-8">
         <link rel="stylesheet" href="/css/baseCss.css">
         <link rel="stylesheet" href="/css/problemSolve.css">
-        <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
-        <script src="https://codemirror.net/lib/codemirror.js"></script>
-        <script src="https://codemirror.net/mode/python/python.js"></script> 
     </head>
     <body>
         <%- include('blockHeader.ejs') %>
@@ -42,8 +39,11 @@
 
                     <form class="form-box" action="/problemSumit" method="POST">
                         <h4>문제 답란</h4>
+                        
+                        <input id="code" name="code"></textarea>
+                        <input name="id" value="<%= userData._id %>" style="display: none;">
+                        <input name="problemId" value="<%= dataSet._id %>" >
                         <button type="submit">전송</button>
-                        <textarea id="code" name="code"></textarea>
                     </form>
                 </div>
             </div>
@@ -51,13 +51,5 @@
 
 
         <%- include('blockFooter.ejs') %>
-
-        <script>
-            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-                lineNumbers: true,
-                mode: "python",  // 다른 언어도 지원
-                theme: "default",  // 다양한 테마 지원
-            });
-        </script>
     </body>
 </html>

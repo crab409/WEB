@@ -18,7 +18,14 @@ const MongoStore = require('connect-mongo')
 const bcrypt = require('bcrypt')
 
 // #핵심부품
-const { callChatGPT } = require('./public/javaScript/chatGptProblemCreate');
+//const { callChatGPT, chatgptScore } = require('./public/javaScript/chatGptProblemCreate');
+
+require('dotenv').config();
+const OpenAIApi = require('openai');
+
+const openai = new OpenAIApi({
+    api_key: 'process.env.OPENAI_API_KEY'
+});
 
 
 //미들웨어나 설정을 등록 뭐시기
@@ -112,8 +119,6 @@ passport.serializeUser((user, done) => {
     process.nextTick(() => {
         done(null, {
             id: user._id,
-            username: user.username,
-            clearCount: user.clearCount
         })
     })
 })
@@ -151,23 +156,129 @@ const peopleDataSort = function(dataSet) {
     return dataSet;
 }
 
+async function testChat(message) {
+    try {
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                { role: 'system', content: "다음 내용에서 HTML 태그를 제외한 내용을 한글 존대말로 100자 이내로 요약해주세요." },
+                { role: 'user', content: message },
+            ],
+        });
+
+        // 모델의 응답에서 답변 가져오기
+        const answer = response.choices[0].message;
+        //console.log('ChatGPT 답변:', answer);
+
+        return answer;
+    } catch (error) {
+        console.error('ChatGPT 요청 중 오류:', error);
+        throw error;
+    }
+}
+
+async function chatgptScore(userCode, testCase, answerTable) {
+    let messageToSystem = 
+    `당신은 온라인 저지 서비스의 채점 시스템입니다. 
+    당신에게는 유저의 코드와 테스트 케이스, 그리고 그 테스트 케이스에 맞는 정답표가 주어집니다.
+    만약 테스트 케이스가 없는 경우, 즉, 입력이 없는 경우 테스트 케이스는 null로 표기됩니다.
+    유저 코드는 python으로 작성되었습니다.
+    
+    만약, 유저의 코드에 테스트 케이스를 대입하였을때, 정답표와 일치하는 답이 나오면 '1'을 일치하지 못하는 때에는 '0'을 출력하면 됩니다.
+    혹은 코드 구문 오류나, 실행중 오류가 발생하는 경우에는 '-1'을 출력하십시오.
+    
+    아래에 예제문 3개가 첨부됩니다. 
+    각각 Hello, World출력문제, 정수 두개 입력받고 더하여 출력하는 문제, 정수 두개를 입력받고 곱하여 출력하는 문제입니다
+    {예제문1 유저 입력
+    >유저의 코드
+    print("Hello, World!")
+
+    >테스트 케이스
+    null
+
+    >정답표 
+    Hello, World!
+    }
+    {예제문1 chatGPT 답변
+    1
+    }
+
+    {예제문2 유저 입력
+    >유저 코드
+    num1, num2 = map(int, input().split())
+    print(num1-num2)
+
+    >테스트 케이스
+    1 2
+
+    >정답표
+    3
+    }
+    {예제문2 chatGPT 답변
+    0
+    }
+    {예제문3 유저 입력
+    >유저 코드
+    num1, num2 = map(int, input().split())
+    print(num1*num2
+
+    >테스트 케이스
+    1 2
+
+    >정답표
+    2
+    }
+    {예제문2 chatGPT 답변
+    -1
+    }`
+
+    let messageFromUser = `
+    >유저 코드
+    ${userCode}
+
+    >테스트 케이스
+    ${testCase}
+
+    >정답표 
+    ${answerTable}`
+
+    try { 
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {role: 'system', content: messageToSystem},
+                {role: 'user', content: messageFromUser}
+            ]
+        });
+
+        const answer = response.choices[0].message.content;
+        //console.log('ChatGPT 답변:', answer);
+    
+        return answer;
+
+
+    } catch(err) {
+        console.error('ChatGPT 요청 중 오류:', err);
+        throw err;
+    }
+}
 
 //링크 입력하면 해당 자료 보내주는 코드
-app.get('/', async (requ, resp) => {
-    //console.log(callChatGPT("다람쥐 챗바퀴 타고파"))
+app.get('/', async (req, res) => {
+    let result = await testChat("다람쥐 챗바퀴 타고파")
+    console.log(result)
 
     let userData = undefined
-    if (requ.user==undefined) {
+    if (req.user==undefined) {
         userData = null
-    } else if (requ.user != undefined){ 
-        userData = {
-            id: requ.user.id,
-            username: requ.user.username
-        }
+    } else if (req.user != undefined){ 
+        userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
     }   
 
+    console.log(userData)
+
     let noticeDataSet = await db.collection('notice').find().toArray()
-    resp.render('index.ejs', {noticeData: noticeDataSet, userData: userData})
+    res.render('index.ejs', {noticeData: noticeDataSet, userData: userData})
 })
 
 app.get('/problem', async (requ, resp) => {
@@ -196,11 +307,9 @@ app.get('/problem/:id', async (req, res) => {
         if (req.user==undefined) {
             userData = null
             res.send("logIn 이후 사용가능한 서비스입니다.")
+
         } else if (req.user != undefined){ 
-            userData = {
-                id: req.user.id,
-                username: req.user.username
-            }
+            userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
             res.render('pageOneProblem.ejs', {dataSet: sibal, userData: userData})
         }
 
@@ -268,8 +377,7 @@ app.get('/account', (requ, resp) => {
     } else if (requ.user != undefined){ 
         userData = {
             id: requ.user.id,
-            username: requ.user.username,
-            clearCount: clearCount
+            username: requ.user.username
         }
     }   
 
@@ -341,4 +449,15 @@ app.post('/logOut', (requ, resp, next) => {
         requ.session.destroy();
         resp.redirect('/')
     })
+})
+
+
+app.post('/problemSumit', (req, res) => {
+    dataSet = {
+        code: req.body.code,
+        userId: req.body.id,
+        problemId: req.body.problemId
+    }
+
+    console.log(dataSet)
 })
