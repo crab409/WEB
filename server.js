@@ -1,3 +1,10 @@
+/**
+ * todo
+ * -채점 시스템 중 기록 시스템 개발
+ * -문제 생성 시스템 개발 
+ */
+
+
 //서버 돌리는 npm 라이브러리 가져오기 
 const express = require('express');
 const app = express();
@@ -56,6 +63,7 @@ app.use(passport.session())
  */
 let localIP;
 var os = require('os');
+const { redirect } = require('express/lib/response');
 var ifaces = os.networkInterfaces();
 Object.keys(ifaces).forEach(function (ifname) {
     var alias = 0;
@@ -184,6 +192,7 @@ async function chatgptScore(userCode, testCase, answerTable) {
     만약 테스트 케이스가 없는 경우, 즉, 입력이 없는 경우 테스트 케이스는 null로 표기됩니다.
     유저 코드는 python으로 작성되었습니다.
     
+    당신은 장문의 말이 아닌, 한글자 혹은 두글자의 단답형 대답만 할 수 있습니다.
     만약, 유저의 코드에 테스트 케이스를 대입하였을때, 정답표와 일치하는 답이 나오면 '1'을 일치하지 못하는 때에는 '0'을 출력하면 됩니다.
     혹은 코드 구문 오류나, 실행중 오류가 발생하는 경우에는 '-1'을 출력하십시오.
     
@@ -262,6 +271,378 @@ async function chatgptScore(userCode, testCase, answerTable) {
         throw err;
     }
 }
+async function createProblem(userCode, testCase, answerTable) {
+    let messageToSystem = `
+    당신은 온라인 저지 문제를 출제하는 출제자입니다. 
+    입력값은 문제의 난이도와 알고리즘 종류가 입력됩니다. 
+    
+    문제의 난이도는 0~5까지 존재하며 각각 
+    0레벨은 백준 새싹레벨과 대응합니다. 즉, print("Hello, world!")와 같은 간단한 문제를 출제합니다.
+    1레벨은 백준 브론즈V와 대응합니다. 간단한 초보자도 쉽게 풀수 있는 간단한 문제를 출제합니다.
+    2~4레벨은 백준 브론즈IV~II에 대응합니다. 알고리즘을 공부하는 일반인이 풀만한 문제를 출제합니다.
+    5레벨은 백준 브론즈I에 대응합니다. 알고리즘에 대해 공부한 사람이 도전할 만한 문제를 출제합니다. 
+    또한 0~1레벨은 Python을 처음 접하는 초보자를 위해서 제작하는 문제인 만큼 팁이나 사용하면 종은 함수 혹은 제어문에 대한 설명이 첨부되어야 합니다.
+
+    알고리즘 종류에 대하여, 입력은 쉼표(,)로 구분된 0개 이상의 문자열 값입니다
+    만약 0개의 값, 즉 null값이 입력되는 경우, 구현문제나 랜덤한 알고리즘 문제를 출제합니다.
+
+    출력에 대해서는 아래 항목으로 이루어져 있다.
+    title: 문제의 제목이다.
+    content: 문제의 내용이다.
+    inputExplain: 입력값의 입력 형태나 값의 범위를 지정하여 유저에게 제공한다.
+    outputExplain: 출력값의 출력 형태를 지정하여 유저에게 제공한다.
+    sampleInput: 유저에게 제공하는 입력값의 예제이다.
+    sampleOutput: 유저에게 제공하는 출력값의 예제이다.
+    testCase: 유저의 코드에 대입할 값이다.
+    answerTable: testCase의 값에 대한 정답표이다. 
+
+    ChatGPT 출력의 형테는 
+    /여는 태그(줄넘김)
+    항목(줄넘김)
+    닫는 태그/
+    위와 같은 형태로 출력한다
+
+    아래는 출력 예제입니다.
+    출력 예제와 정확히 맞추어 출력하여야 합니다. 사족을 붙히지 말고 형식에 맞추어야 하며 그러지 않을시 프로그램에 오류가 발생할 수 있습니다. 
+    {예제문1 유저 입력
+    >level
+    0
+
+    >algorithm
+    null
+    }
+    {예제문1 chatGPT 답변
+    /title
+    Hello! World!
+    title/
+    /content
+    "Hello, World!"를 출력하세요
+    (큰따움표 제외)
+    
+    print("문장")
+    위와 같이 소스코드를 작성하면
+    문장이 출력된다. 
+    
+    즉
+    print("Hello")
+    의 결과는 
+    Hello이다.
+    content/
+    /inputExplain
+    입력없음
+    inputExplain/
+    /outputExplain
+    Hello, World!를 출력한다.
+    outputExplain/
+    /sampleInput
+    입력없음
+    sampleInput/
+    /sampleOutput
+    Hello, World!
+    sampleOutput/
+    /answerTable
+    /testCase
+    null
+    testCase/
+    Hello, World!
+    answerTable/
+    }
+    `
+
+    let messageFromUser = ``
+
+    try { 
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {role: 'system', content: messageToSystem},
+                {role: 'user', content: messageFromUser}
+            ]
+        });
+
+        const answer = response.choices[0].message.content;
+        //console.log('ChatGPT 답변:', answer);
+    
+        return answer;
+
+
+    } catch(err) {
+        console.error('ChatGPT 요청 중 오류:', err);
+        throw err;
+    }
+}
+async function createProblem(level, algo) {
+
+
+
+    let messageToSystem = `
+당신은 온라인 저지 문제를 출제하는 출제자입니다. 
+입력값은 문제의 난이도와 알고리즘 종류가 입력됩니다. 
+
+문제의 난이도는 0~5까지 존재하며 각각 
+0레벨은 백준 새싹레벨과 대응합니다. 즉, print("Hello, world!")와 같은 간단한 문제를 출제합니다.
+1레벨은 백준 브론즈V와 대응합니다. 간단한 초보자도 쉽게 풀수 있는 간단한 문제를 출제합니다.
+2~4레벨은 백준 브론즈IV~II에 대응합니다. 알고리즘을 공부하는 일반인이 풀만한 문제를 출제합니다.
+5레벨은 백준 브론즈I에 대응합니다. 알고리즘에 대해 공부한 사람이 도전할 만한 문제를 출제합니다. 
+또한 0~1레벨은 Python을 처음 접하는 초보자를 위해서 제작하는 문제인 만큼 팁이나 사용하면 종은 함수 혹은 제어문에 대한 설명이 첨부되어야 합니다.
+
+알고리즘 종류에 대하여, 입력은 쉼표(,)로 구분된 0개 이상의 문자열 값
+만약 0개의 값, 즉 null값이 입력되는 경우, 구현문제나 랜덤한 알고리즘 문제를 출제
+
+
+출력에 대해서는 아래 태그들로 이루어져 있다.
+title: 문제의 제목이다.
+content: 문제의 내용이다.
+inputExplain: 입력값의 입력 형태나 값의 범위를 지정하여 유저에게 제공한다.
+outputExplain: 출력값의 출력 형태를 지정하여 유저에게 제공한다.
+sampleInput: 유저에게 제공하는 입력값의 예제이다.
+sampleOutput: 유저에게 제공하는 출력값의 예제이다.
+testCase: 유저의 코드에 대입할 값, testCase는 한 개로 제한한다. 또한 testCase는 할 수 있는 한 sampleInput과 차이를 두어야 한다.
+answerTable: testCase의 값에 대한 정답표이다. 
+
+ChatGPT 출력의 형테는 
+
+/태그
+항목
+태그/
+
+위와 같은 형태로 출력. 슬래쉬(/)를 이용한 태그의 열고 닫기를 꼭 지킬것
+또한 항목은 한국어로 출력하며, 태그는 영문자로 출력한다.
+
+아래는 입력에 대한 출력 예제입니다.
+형식에 정확히 맞추어 출력하여야 합니다. 
+{예제문1 유저 입력
+>level
+0
+
+>algorithm
+null
+}
+
+{예제문1 chatGPT 답변
+/title
+Hello! World!
+title/
+
+/content
+"Hello, World!"를 출력하세요
+(큰따움표 제외)
+
+print("문장")
+위와 같이 소스코드를 작성하면
+문장이 출력된다. 
+
+즉
+print("Hello")
+의 결과는 
+Hello이다.
+content/
+
+/inputExplain
+입력없음
+inputExplain/
+
+/outputExplain
+Hello, World!를 출력한다.
+outputExplain/
+
+/sampleInput
+입력없음
+sampleInput/
+
+/sampleOutput
+Hello, World!
+sampleOutput/
+
+/testCase
+null
+testCase/
+
+/answerTable
+Hello, World!
+answerTable/
+}`
+
+    let messageFromUser = `
+>level
+${level}
+    
+>algorithm
+${algo}`
+
+    try { 
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {role: 'system', content: messageToSystem},
+                {role: 'user', content: messageFromUser}
+            ]
+        });
+
+        const answer = response.choices[0].message.content;
+        //console.log('ChatGPT 답변:', answer);
+    
+        let result = answer.split('\n');
+        //console.log(result)
+        
+        let title = ""
+        let content =  ""
+        let inputExplain =  ""
+        let outputExplain = ""
+        let sampleInput = ""
+        let sampleOutput = ""
+        let testCase = ""
+        let answerTable = ""
+        
+
+        for(let i=0; i<result.length; i++) {
+            if(result[i]==='/title') {
+                for(let j=i+1; j<result.length; j++) { // j=i+1로 시작
+                    if (result[j]!="title/") {
+                        title = title + result[j];
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if(result[i]==='/content') {
+                for(let j=i+1; j<result.length; j++) {
+                    if (result[j]!="content/") {
+                        content = content + result[j];
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if(result[i]==='/inputExplain') {
+                for(let j=i+1; j<result.length; j++) {
+                    if (result[j]!="inputExplain/") {
+                        inputExplain = inputExplain + result[j];
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if(result[i]==='/outputExplain') {
+                for(let j=i+1; j<result.length; j++) {
+                    if (result[j]!="outputExplain/") {
+                        outputExplain = outputExplain + result[j];
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if(result[i]==='/sampleInput') {
+                for(let j=i+1; j<result.length; j++) {
+                    if (result[j]!="sampleInput/") {
+                        sampleInput = sampleInput + result[j];
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if(result[i]==='/sampleOutput') {
+                for(let j=i+1; j<result.length; j++) {
+                    if (result[j]!="sampleOutput/") {
+                        sampleOutput = sampleOutput + result[j];
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if(result[i]==='/testCase') {
+                for(let j=i+1; j<result.length; j++) {
+                    if (result[j]!="testCase/") {
+                        testCase = testCase + result[j];
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if(result[i]==='/answerTable') {
+                for(let j=i+1; j<result.length; j++) {
+                    if (result[j]!="answerTable/") {  // 이 부분의 오타 수정: answerTable
+                        answerTable = answerTable + result[j];
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        
+
+        let newProblemDataSet = {
+            title: title,
+            content: content,
+            inputExplain: inputExplain,
+            outputExplain: outputExplain,
+            sampleInput: sampleInput,
+            sampleOutput: sampleOutput,
+            testCase: testCase,
+            answerTable: answerTable
+        }
+
+        return newProblemDataSet;
+
+
+    } catch(err) {
+        console.error('ChatGPT 요청 중 오류:', err);
+        throw err;
+    }
+}
+
+async function isOk(level, algo) {
+    for(let i=0; i<5; i++) {
+
+        let newProblemDataSet = await createProblem(level, algo);
+        //console.log(newProblemDataSet)
+        messageToSystem = `당신은 온라인 저지 문제집 사이트의 문제에 문제점이 없는지 검사하는 검수를 진행할 것입니다. 입력값은 문제에 대한 8개의 제목, 내용, 입력 설명, 출력 설명, 입력 예제, 출력 예제, 테스트 케이스, 정답표입니다.
+        특히 문제에 대해서 테스트 케이스에 대한 정답표를 비교하여 이것이 맞는 정답인지 확인하십시오 
+        
+        당신의 출력은 오직 단답형입니다
+        정상적일 경우 1
+        문제의 형식이 어색한 경우 2
+        문제의 답안이 틀린 경우 3
+        을 출력하면 됩니다.`
+
+        messageFromUser = `
+title: ${newProblemDataSet.title}
+content: ${newProblemDataSet.content}
+inputExplain: ${newProblemDataSet.inputExplain}
+outputExplain: ${newProblemDataSet.outputExplain}
+sampleInput: ${newProblemDataSet.sampleInput}
+sampleOutput: ${newProblemDataSet.sampleOutput}
+testCase: ${newProblemDataSet.testCase}
+answerTable: ${newProblemDataSet.answerTable}
+`
+        console.log(messageFromUser)
+
+        try {
+            const response = await openai.chat.completions.create({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                  { role: 'system', content: messageToSystem },
+                  { role: 'user', content: messageFromUser },
+                ],
+            });
+    
+            // 모델의 응답에서 답변 가져오기
+            const answer = response.choices[0].message.content;
+            console.log('ChatGPT 답변:', answer);
+    
+            if(answer[0]=='1') {
+                return newProblemDataSet
+            } else if (answer=='2') {
+                console.log("형식에 문제가 존재")
+            } else if (answer=='3') {
+                console.log("답란에 문제가 존재")
+            }
+        } catch (error) {
+            console.error('ChatGPT 요청 중 오류:', error);
+            throw error;
+        }
+    }
+}
 
 //링크 입력하면 해당 자료 보내주는 코드
 app.get('/', async (req, res) => {
@@ -294,7 +675,6 @@ app.get('/problem', async (requ, resp) => {
     }
 
     let problemDataSet = await db.collection('problem').find().toArray()
-    console.log(problemDataSet)
     resp.render('problem.ejs', {dataSet : problemDataSet, userData:userData})
 })
 
@@ -390,22 +770,26 @@ app.get('/account', (requ, resp) => {
     }
 })
 
-app.get('/register', (requ, resp) => {
+app.get('/register', async (req, res) => {
     let userData = undefined
-    if (requ.user==undefined) {
+    if(req.user==undefined) {
         userData = null
-    } else if (requ.user != undefined){ 
-        userData = {
-            id: requ.user.id,
-            username: requ.user.username
-        }
+    } else if (req.user != undefined) {
+        userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
     }
 
-    resp.render('pageRegister.ejs', {userData: userData})
+    res.render('pageRegister.ejs', {userData: userData})
 })
 
-app.get('/aiCreater', (requ, resp) => {
-    resp.render('pageAiCreater.ejs')
+app.get('/aiCreater', async (req, res) => {
+    let userData = undefined
+    if(req.user==undefined) {
+        userData = null
+        res.send('log in이후 사용가능한 서비스입니다.')
+    } else if (req.user != undefined) {
+        userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
+        res.render('pageAiCreater.ejs', {userData: userData})
+    }
 })
 
 
@@ -425,12 +809,14 @@ app.post('/login', async (requ, resp, next) => {
 app.post('/register', async (requ, resp, next) => {
 
     //정보 암호화(해싱) 하는 코드, 하지만 난 상남자기 때문에 주석 처리할꺼임
-    //let hashedPassword = await bcrypt.hash(요청.body.password, 10)
+    //let hashedPassword = await bcrypt.hash(requ.body.password, 10)
 
     await db.collection('user').insertOne({
         username: requ.body.username,
         password: requ.body.password,
-        clearCount: 0
+        clearCount: 0,
+        clear: "",
+        wrong: ""
     })
 
     passport.authenticate('local', (error, user, info) => {
@@ -452,7 +838,7 @@ app.post('/logOut', (requ, resp, next) => {
 })
 
 
-app.post('/problemSumit', (req, res) => {
+app.post('/problemSumit', async (req, res) => {
     dataSet = {
         code: req.body.code,
         userId: req.body.id,

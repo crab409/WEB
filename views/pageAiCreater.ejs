@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/css/baseCss.css">
+    </head>
+    <body>
+        <%- include('blockHeader.ejs') %>
+
+
+        <div id="base-main">
+            <div class="side-bar">
+                this is side bar
+            </div>
+            <div class="main">
+                <div class="jumbo"><h2>문재 생성</h2></div>
+                <div class="container">
+                    <form class="form-box" action="/createProblem" method="POST">
+                        <h4>문제 난이도 0~5, 알고리즘 설정</h4>
+                        <input name="problemLevel">
+                        <input name="problemAlgorithm">
+                        <input name="createrId" value="<%= userData._id %>" style="display: none;">
+                        <button type="submit">전송</button>
+                    </form> 
+                </div>
+            </div>
+        </div>
+
+
+        <%- include('blockFooter.ejs') %>
+    </body>
+</html>

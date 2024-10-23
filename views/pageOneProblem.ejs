@@ -19,7 +19,7 @@
                 <div class="container">
                     <div class="content-header"><h3>
                         <%= JSON.stringify(dataSet.title) %>
-                        <%= JSON.stringify(dataSet.cleareCount) %>
+                        <%= JSON.stringify(dataSet.clearCount) %>
                     </h3></div>
                     <div class="content">
                         <%- dataSet.content.replace(/\n/g, '<br>') %>
@@ -32,9 +32,9 @@
                     </div>
                     <div class="sample">
                         <h4>입력 예제</h4>
-                        <%= JSON.stringify(dataSet.sampleInput1) %>
+                        <%= JSON.stringify(dataSet.sampleInput) %>
                         <h4>출력 예제</h4>
-                        <%= JSON.stringify(dataSet.sampleOutput1) %>
+                        <%= JSON.stringify(dataSet.sampleOutput) %>
                     </div>
 
                     <form class="form-box" action="/problemSumit" method="POST">
@@ -42,7 +42,7 @@
                         
                         <input id="code" name="code"></textarea>
                         <input name="id" value="<%= userData._id %>" style="display: none;">
-                        <input name="problemId" value="<%= dataSet._id %>" >
+                        <input name="problemId" value="<%= dataSet._id %>" style="display: none;">
                         <button type="submit">전송</button>
                     </form>
                 </div>
