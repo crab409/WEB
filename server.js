@@ -371,6 +371,106 @@ async function createProblem(userCode, testCase, answerTable) {
         throw err;
     }
 }
+async function createProblem(userCode, testCase, answerTable) {
+    let messageToSystem = `
+    당신은 온라인 저지 문제를 출제하는 출제자입니다. 
+    입력값은 문제의 난이도와 알고리즘 종류가 입력됩니다. 
+    
+    문제의 난이도는 0~5까지 존재하며 각각 
+    0레벨은 백준 새싹레벨과 대응합니다. 즉, print("Hello, world!")와 같은 간단한 문제를 출제합니다.
+    1레벨은 백준 브론즈V와 대응합니다. 간단한 초보자도 쉽게 풀수 있는 간단한 문제를 출제합니다.
+    2~4레벨은 백준 브론즈IV~II에 대응합니다. 알고리즘을 공부하는 일반인이 풀만한 문제를 출제합니다.
+    5레벨은 백준 브론즈I에 대응합니다. 알고리즘에 대해 공부한 사람이 도전할 만한 문제를 출제합니다. 
+    또한 0~1레벨은 Python을 처음 접하는 초보자를 위해서 제작하는 문제인 만큼 팁이나 사용하면 종은 함수 혹은 제어문에 대한 설명이 첨부되어야 합니다.
+
+    알고리즘 종류에 대하여, 입력은 쉼표(,)로 구분된 0개 이상의 문자열 값입니다
+    만약 0개의 값, 즉 null값이 입력되는 경우, 구현문제나 랜덤한 알고리즘 문제를 출제합니다.
+
+    출력에 대해서는 아래 항목으로 이루어져 있다.
+    title: 문제의 제목이다.
+    content: 문제의 내용이다.
+    inputExplain: 입력값의 입력 형태나 값의 범위를 지정하여 유저에게 제공한다.
+    outputExplain: 출력값의 출력 형태를 지정하여 유저에게 제공한다.
+    sampleInput: 유저에게 제공하는 입력값의 예제이다.
+    sampleOutput: 유저에게 제공하는 출력값의 예제이다.
+    testCase: 유저의 코드에 대입할 값이다.
+    answerTable: testCase의 값에 대한 정답표이다. 
+
+    ChatGPT 출력의 형테는 
+    /여는 태그(줄넘김)
+    항목(줄넘김)
+    닫는 태그/
+    위와 같은 형태로 출력한다
+
+    아래는 출력 예제입니다.
+    출력 예제와 정확히 맞추어 출력하여야 합니다. 사족을 붙히지 말고 형식에 맞추어야 하며 그러지 않을시 프로그램에 오류가 발생할 수 있습니다. 
+    {예제문1 유저 입력
+    >level
+    0
+
+    >algorithm
+    null
+    }
+    {예제문1 chatGPT 답변
+    /title
+    Hello! World!
+    title/
+    /content
+    "Hello, World!"를 출력하세요
+    (큰따움표 제외)
+    
+    print("문장")
+    위와 같이 소스코드를 작성하면
+    문장이 출력된다. 
+    
+    즉
+    print("Hello")
+    의 결과는 
+    Hello이다.
+    content/
+    /inputExplain
+    입력없음
+    inputExplain/
+    /outputExplain
+    Hello, World!를 출력한다.
+    outputExplain/
+    /sampleInput
+    입력없음
+    sampleInput/
+    /sampleOutput
+    Hello, World!
+    sampleOutput/
+    /answerTable
+    /testCase
+    null
+    testCase/
+    Hello, World!
+    answerTable/
+    }
+    `
+
+    let messageFromUser = ``
+
+    try { 
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {role: 'system', content: messageToSystem},
+                {role: 'user', content: messageFromUser}
+            ]
+        });
+
+        const answer = response.choices[0].message.content;
+        //console.log('ChatGPT 답변:', answer);
+    
+        return answer;
+
+
+    } catch(err) {
+        console.error('ChatGPT 요청 중 오류:', err);
+        throw err;
+    }
+}
 async function createProblem(level, algo) {
 
 
@@ -845,5 +945,29 @@ app.post('/problemSumit', async (req, res) => {
         problemId: req.body.problemId
     }
 
-    console.log(dataSet)
+    let problemData = await db.collection('problem').findOne({_id: new ObjectId(dataSet.problemId)})
+    let userData = await db.collection('user').findOne({_id: new ObjectId(dataSet.userId)})
+
+    let userSolvedData = userData.clear.split(',')
+
+
+    console.log(problemData)
+    console.log(userData)
+
+    let result = await chatgptScore(dataSet.code, problemData.testCase, problemData.answerTable)
+
+    if (result[0]==='1') {
+        console.log("정답 입력됨")
+        await db.collection('user').updateOne({_id: new ObjectId(userData._id)},{
+            $set: {clearCount: (userData.clearCount+1), clear: userData.clear + `${problemData.number}`}
+        })
+        await db.collection('problem').updateOne({_id: new ObjectId(problemData._id)}, {
+            $set: {clearCount: (problemData.clearCount+1)}
+        })
+    } else {
+        console.log("정답이 아닌것이 입력됨")
+    }
+
+    console.log(result)
+    res.send('처리 완료')
 })
