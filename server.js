@@ -1,5 +1,5 @@
 /**
- * todo
+ * todo`````````
  * -채점 시스템 중 기록 시스템 개발
  * -문제 생성 시스템 개발 
  */
@@ -271,206 +271,7 @@ async function chatgptScore(userCode, testCase, answerTable) {
         throw err;
     }
 }
-async function createProblem(userCode, testCase, answerTable) {
-    let messageToSystem = `
-    당신은 온라인 저지 문제를 출제하는 출제자입니다. 
-    입력값은 문제의 난이도와 알고리즘 종류가 입력됩니다. 
-    
-    문제의 난이도는 0~5까지 존재하며 각각 
-    0레벨은 백준 새싹레벨과 대응합니다. 즉, print("Hello, world!")와 같은 간단한 문제를 출제합니다.
-    1레벨은 백준 브론즈V와 대응합니다. 간단한 초보자도 쉽게 풀수 있는 간단한 문제를 출제합니다.
-    2~4레벨은 백준 브론즈IV~II에 대응합니다. 알고리즘을 공부하는 일반인이 풀만한 문제를 출제합니다.
-    5레벨은 백준 브론즈I에 대응합니다. 알고리즘에 대해 공부한 사람이 도전할 만한 문제를 출제합니다. 
-    또한 0~1레벨은 Python을 처음 접하는 초보자를 위해서 제작하는 문제인 만큼 팁이나 사용하면 종은 함수 혹은 제어문에 대한 설명이 첨부되어야 합니다.
 
-    알고리즘 종류에 대하여, 입력은 쉼표(,)로 구분된 0개 이상의 문자열 값입니다
-    만약 0개의 값, 즉 null값이 입력되는 경우, 구현문제나 랜덤한 알고리즘 문제를 출제합니다.
-
-    출력에 대해서는 아래 항목으로 이루어져 있다.
-    title: 문제의 제목이다.
-    content: 문제의 내용이다.
-    inputExplain: 입력값의 입력 형태나 값의 범위를 지정하여 유저에게 제공한다.
-    outputExplain: 출력값의 출력 형태를 지정하여 유저에게 제공한다.
-    sampleInput: 유저에게 제공하는 입력값의 예제이다.
-    sampleOutput: 유저에게 제공하는 출력값의 예제이다.
-    testCase: 유저의 코드에 대입할 값이다.
-    answerTable: testCase의 값에 대한 정답표이다. 
-
-    ChatGPT 출력의 형테는 
-    /여는 태그(줄넘김)
-    항목(줄넘김)
-    닫는 태그/
-    위와 같은 형태로 출력한다
-
-    아래는 출력 예제입니다.
-    출력 예제와 정확히 맞추어 출력하여야 합니다. 사족을 붙히지 말고 형식에 맞추어야 하며 그러지 않을시 프로그램에 오류가 발생할 수 있습니다. 
-    {예제문1 유저 입력
-    >level
-    0
-
-    >algorithm
-    null
-    }
-    {예제문1 chatGPT 답변
-    /title
-    Hello! World!
-    title/
-    /content
-    "Hello, World!"를 출력하세요
-    (큰따움표 제외)
-    
-    print("문장")
-    위와 같이 소스코드를 작성하면
-    문장이 출력된다. 
-    
-    즉
-    print("Hello")
-    의 결과는 
-    Hello이다.
-    content/
-    /inputExplain
-    입력없음
-    inputExplain/
-    /outputExplain
-    Hello, World!를 출력한다.
-    outputExplain/
-    /sampleInput
-    입력없음
-    sampleInput/
-    /sampleOutput
-    Hello, World!
-    sampleOutput/
-    /answerTable
-    /testCase
-    null
-    testCase/
-    Hello, World!
-    answerTable/
-    }
-    `
-
-    let messageFromUser = ``
-
-    try { 
-        const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
-            messages: [
-                {role: 'system', content: messageToSystem},
-                {role: 'user', content: messageFromUser}
-            ]
-        });
-
-        const answer = response.choices[0].message.content;
-        //console.log('ChatGPT 답변:', answer);
-    
-        return answer;
-
-
-    } catch(err) {
-        console.error('ChatGPT 요청 중 오류:', err);
-        throw err;
-    }
-}
-async function createProblem(userCode, testCase, answerTable) {
-    let messageToSystem = `
-    당신은 온라인 저지 문제를 출제하는 출제자입니다. 
-    입력값은 문제의 난이도와 알고리즘 종류가 입력됩니다. 
-    
-    문제의 난이도는 0~5까지 존재하며 각각 
-    0레벨은 백준 새싹레벨과 대응합니다. 즉, print("Hello, world!")와 같은 간단한 문제를 출제합니다.
-    1레벨은 백준 브론즈V와 대응합니다. 간단한 초보자도 쉽게 풀수 있는 간단한 문제를 출제합니다.
-    2~4레벨은 백준 브론즈IV~II에 대응합니다. 알고리즘을 공부하는 일반인이 풀만한 문제를 출제합니다.
-    5레벨은 백준 브론즈I에 대응합니다. 알고리즘에 대해 공부한 사람이 도전할 만한 문제를 출제합니다. 
-    또한 0~1레벨은 Python을 처음 접하는 초보자를 위해서 제작하는 문제인 만큼 팁이나 사용하면 종은 함수 혹은 제어문에 대한 설명이 첨부되어야 합니다.
-
-    알고리즘 종류에 대하여, 입력은 쉼표(,)로 구분된 0개 이상의 문자열 값입니다
-    만약 0개의 값, 즉 null값이 입력되는 경우, 구현문제나 랜덤한 알고리즘 문제를 출제합니다.
-
-    출력에 대해서는 아래 항목으로 이루어져 있다.
-    title: 문제의 제목이다.
-    content: 문제의 내용이다.
-    inputExplain: 입력값의 입력 형태나 값의 범위를 지정하여 유저에게 제공한다.
-    outputExplain: 출력값의 출력 형태를 지정하여 유저에게 제공한다.
-    sampleInput: 유저에게 제공하는 입력값의 예제이다.
-    sampleOutput: 유저에게 제공하는 출력값의 예제이다.
-    testCase: 유저의 코드에 대입할 값이다.
-    answerTable: testCase의 값에 대한 정답표이다. 
-
-    ChatGPT 출력의 형테는 
-    /여는 태그(줄넘김)
-    항목(줄넘김)
-    닫는 태그/
-    위와 같은 형태로 출력한다
-
-    아래는 출력 예제입니다.
-    출력 예제와 정확히 맞추어 출력하여야 합니다. 사족을 붙히지 말고 형식에 맞추어야 하며 그러지 않을시 프로그램에 오류가 발생할 수 있습니다. 
-    {예제문1 유저 입력
-    >level
-    0
-
-    >algorithm
-    null
-    }
-    {예제문1 chatGPT 답변
-    /title
-    Hello! World!
-    title/
-    /content
-    "Hello, World!"를 출력하세요
-    (큰따움표 제외)
-    
-    print("문장")
-    위와 같이 소스코드를 작성하면
-    문장이 출력된다. 
-    
-    즉
-    print("Hello")
-    의 결과는 
-    Hello이다.
-    content/
-    /inputExplain
-    입력없음
-    inputExplain/
-    /outputExplain
-    Hello, World!를 출력한다.
-    outputExplain/
-    /sampleInput
-    입력없음
-    sampleInput/
-    /sampleOutput
-    Hello, World!
-    sampleOutput/
-    /answerTable
-    /testCase
-    null
-    testCase/
-    Hello, World!
-    answerTable/
-    }
-    `
-
-    let messageFromUser = ``
-
-    try { 
-        const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
-            messages: [
-                {role: 'system', content: messageToSystem},
-                {role: 'user', content: messageFromUser}
-            ]
-        });
-
-        const answer = response.choices[0].message.content;
-        //console.log('ChatGPT 답변:', answer);
-    
-        return answer;
-
-
-    } catch(err) {
-        console.error('ChatGPT 요청 중 오류:', err);
-        throw err;
-    }
-}
 async function createProblem(level, algo) {
 
 
@@ -510,7 +311,9 @@ ChatGPT 출력의 형테는
 또한 항목은 한국어로 출력하며, 태그는 영문자로 출력한다.
 
 아래는 입력에 대한 출력 예제입니다.
-형식에 정확히 맞추어 출력하여야 합니다. 
+형식에 정확히 맞추어 출력하여야 합니다.
+
+사용자의 가독성을 위하여 줄넘김(\\n)과 같은 개행문자를 권장합니다.
 {예제문1 유저 입력
 >level
 0
@@ -572,7 +375,7 @@ ${algo}`
 
     try { 
         const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4-turbo',
             messages: [
                 {role: 'system', content: messageToSystem},
                 {role: 'user', content: messageFromUser}
@@ -692,6 +495,7 @@ ${algo}`
 }
 
 async function isOk(level, algo) {
+    console.log(level, algo)
     for(let i=0; i<5; i++) {
 
         let newProblemDataSet = await createProblem(level, algo);
@@ -719,7 +523,7 @@ answerTable: ${newProblemDataSet.answerTable}
 
         try {
             const response = await openai.chat.completions.create({
-                model: 'gpt-3.5-turbo',
+                model: 'gpt-4-turbo',
                 messages: [
                   { role: 'system', content: messageToSystem },
                   { role: 'user', content: messageFromUser },
@@ -762,20 +566,24 @@ app.get('/', async (req, res) => {
     res.render('index.ejs', {noticeData: noticeDataSet, userData: userData})
 })
 
-app.get('/problem', async (requ, resp) => {
+app.get('/problem', async (req, res) => {
 
     let userData = undefined
-    if (requ.user==undefined) {
+    if (req.user==undefined) {
         userData = null
-    } else if (requ.user != undefined){ 
-        userData = {
-            id: requ.user.id,
-            username: requ.user.username
-        }
-    }
+        res.render('pageYouNeedLogIn.ejs', {userData: userData})
+    } else if (req.user != undefined){ 
+        userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
+        solvedNumber = userData.clear;
 
-    let problemDataSet = await db.collection('problem').find().toArray()
-    resp.render('problem.ejs', {dataSet : problemDataSet, userData:userData})
+        //콤마, 숫자, 공백으로 이루어진 문자열을 정수 배열로 변환하는 코드
+        solvedNumber = solvedNumber.split(',').map(item => Number(item.trim()));
+        
+        let problemDataSet = await db.collection('problem').find().toArray()
+        res.render('problem.ejs', {dataSet : problemDataSet, userData:userData})
+
+    }
+    
 })
 
 app.get('/problem/:id', async (req, res) => {
@@ -970,4 +778,49 @@ app.post('/problemSumit', async (req, res) => {
 
     console.log(result)
     res.send('처리 완료')
+})
+
+app.post('/createProblem', async (req, res) => {
+    inputData = {
+        level: req.body.problemLevel,
+        algo: req.body.problemAlgorithm,
+        createrId: req.body.createrId
+    }
+
+    let result = await isOk(inputData.level, inputData.algo);
+    if (result == undefined) {
+        res.send('생성실패...\n 다시 시도하시오.')
+    } else {
+        let userData = await db.collection('user').findOne({_id: new ObjectId(inputData.createrId)})
+        console.log(result)
+        res.render('pageRenderChecker.ejs', {dataSet: result, userData:userData})
+    }
+})
+
+app.post('/problemRenderSumit', async (req, res) => {
+    let problemList = await db.collection('problem').find().toArray()
+    let newNumber = await problemList[problemList.length-1] + 1;
+
+    newProblemDataSet = {
+        number: newNumber,
+        title: req.body.title,
+        content: req.body.content,
+        inputExplain: req.body.inputExplain,
+        outputExplain: req.body.outputExplain,
+        sampleInput: req.body.sampleInput,
+        sampleOutput: req.body.sampleOutput,
+        testCase: req.body.testCase,
+        asnwerTable: req.body.answerTable,
+        createrId: req.body.createrId,
+        isGenerated: true,
+        clearCount: 0
+    }
+    let userData = await db.collection('user').findOne({_id: new ObjectId(newProblemDataSet.createrId)})
+    await db.collection('problem').insertOne(newProblemDataSet)
+    res.redirect('/problem')
+})
+
+app.post('/cancel', (req, res) => {
+    let userData = db.collection('user').findOne({_id: new ObjectId(req.user.id)})
+    res.redirect('/')
 })
