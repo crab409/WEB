@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>ALZalz | account</title>
         <meta charset="utf-8">
         <link rel="stylesheet" href="/css/baseCss.css">
     </head>
@@ -10,7 +10,6 @@
 
         <div id="base-main">
             <div class="side-bar">
-                this is side bar
             </div>
             <div class="main">
                 <div class="jumbo"><h2>Profile</h2></div>
@@ -18,7 +17,9 @@
                     <h1><%= JSON.stringify(userData.username) %></h1>
 
                     <h2 style="margin: 0px;">푼 문제</h2>
-                    <%= JSON.stringify(userData.clear) %>
+                    <%= userData.clear %>
+                    <h2 style="margin: 0px;">못 푼 문제</h2>
+                    <%= userData.wrong %>
                     <form class="form-box" action="/logOut" method="POST" style="margin-top: 4%;">
                         <button type="submit">로그아웃</button>
                     </form> 

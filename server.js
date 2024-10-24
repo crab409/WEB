@@ -1,7 +1,6 @@
 /**
- * todo`````````
- * -채점 시스템 중 기록 시스템 개발
- * -문제 생성 시스템 개발 
+ * todo
+ * -
  */
 
 
@@ -558,9 +557,7 @@ app.get('/', async (req, res) => {
         userData = null
     } else if (req.user != undefined){ 
         userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
-    }   
-
-    console.log(userData)
+    }
 
     let noticeDataSet = await db.collection('notice').find().toArray()
     res.render('index.ejs', {noticeData: noticeDataSet, userData: userData})
@@ -574,10 +571,6 @@ app.get('/problem', async (req, res) => {
         res.render('pageYouNeedLogIn.ejs', {userData: userData})
     } else if (req.user != undefined){ 
         userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
-        solvedNumber = userData.clear;
-
-        //콤마, 숫자, 공백으로 이루어진 문자열을 정수 배열로 변환하는 코드
-        solvedNumber = solvedNumber.split(',').map(item => Number(item.trim()));
         
         let problemDataSet = await db.collection('problem').find().toArray()
         res.render('problem.ejs', {dataSet : problemDataSet, userData:userData})
@@ -608,31 +601,25 @@ app.get('/problem/:id', async (req, res) => {
     }
 })
 
-app.get('/content', (requ, resp) => {
+app.get('/content', async (req, res) => {
 
     let userData = undefined
-    if (requ.user==undefined) {
+    if (req.user==undefined) {
         userData = null
-    } else if (requ.user != undefined){ 
-        userData = {
-            id: requ.user.id,
-            username: requ.user.username
-        }
+    } else if (req.user != undefined){ 
+        userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
     }
 
-    resp.render('content.ejs', {userData: userData})
+    res.render('content.ejs', {userData: userData})
 })
 
-app.get('/ranking', async (requ, resp) => {
+app.get('/ranking', async (req, res) => {
 
     let userData = undefined
-    if (requ.user==undefined) {
+    if (req.user==undefined) {
         userData = null
-    } else if (requ.user != undefined){ 
-        userData = {
-            id: requ.user.id,
-            username: requ.user.username
-        }
+    } else if (req.user != undefined){ 
+        userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
     }
 
     let peoplesData = await db.collection('user').find().toArray()
@@ -640,21 +627,18 @@ app.get('/ranking', async (requ, resp) => {
 
     console.log(peoplesData)
 
-    resp.render('ranking.ejs', {userData: userData, peoplesData: peoplesData})
+    res.render('ranking.ejs', {userData: userData, peoplesData: peoplesData})
 })
 
-app.get('/aiClass', (requ, resp) => {
+app.get('/aiClass', async (req, res) => {
     let userData = undefined
-    if (requ.user==undefined) {
+    if (req.user==undefined) {
         userData = null
-    } else if (requ.user != undefined){ 
-        userData = {
-            id: requ.user.id,
-            username: requ.user.username
-        }
+    } else if (req.user != undefined){ 
+        userData = userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
     }
 
-    resp.render('aiClass.ejs', {userData: userData})
+    res.render('aiClass.ejs', {userData: userData})
 })
 
 app.get('/account', async (req, res) => {
@@ -721,8 +705,8 @@ app.post('/register', async (requ, resp, next) => {
         username: requ.body.username,
         password: requ.body.password,
         clearCount: 0,
-        clear: "",
-        wrong: ""
+        clear: [],
+        wrong: []
     })
 
     passport.authenticate('local', (error, user, info) => {
@@ -745,38 +729,64 @@ app.post('/logOut', (requ, resp, next) => {
 
 
 app.post('/problemSumit', async (req, res) => {
-    dataSet = {
-        code: req.body.code,
-        userId: req.body.id,
-        problemId: req.body.problemId
+    try {
+        const dataSet = {
+            code: req.body.code,
+            userId: req.body.id,
+            problemId: req.body.problemId
+        };
+
+        let problemData = await db.collection('problem').findOne({ _id: new ObjectId(dataSet.problemId) });
+        let userData = await db.collection('user').findOne({ _id: new ObjectId(dataSet.userId) });
+        let solvedData = userData.clear;
+        let wrongData = userData.wrong;
+
+        console.log(problemData);
+        console.log(userData);
+
+        let result = await chatgptScore(dataSet.code, problemData.testCase, problemData.answerTable);
+
+        if (result[0] === '1') {
+            console.log("정답 입력됨");
+            const problemNumberIndex = solvedData.indexOf(problemData.number);
+
+            if (problemNumberIndex === -1) {
+                console.log("이전에 못 풀었던 거 풀음");
+                solvedData.push(problemData.number);
+                const wrongIndex = wrongData.indexOf(problemData.number);
+                if (wrongIndex !== -1) {
+                    wrongData.splice(wrongIndex, 1); // 잘못된 데이터에서 문제 번호 제거
+                }
+                await db.collection('user').updateOne({ _id: new ObjectId(userData._id) }, {
+                    $set: { clearCount: (userData.clearCount + 1), clear: solvedData, wrong: wrongData }
+                });
+                await db.collection('problem').updateOne({ _id: new ObjectId(problemData._id) }, {
+                    $set: { clearCount: (problemData.clearCount + 1) }
+                });
+            } 
+
+        } else {
+            console.log("정답이 아닌 것이 입력됨");
+            const problemNumberIndex = wrongData.indexOf(problemData.number);
+
+            if (problemNumberIndex === -1) {
+                console.log("이전에 안 풀었던 거 못풀음");
+                wrongData.push(problemData.number);
+                await db.collection('user').updateOne({ _id: new ObjectId(userData._id) }, {
+                    $set: { wrong: wrongData }
+                });
+            } 
+        }
+
+        res.redirect('/problem')
+
+    } catch (error) {
+        console.error("에러 발생:", error);
+        res.status(500).send('서버 오류가 발생했습니다.');
     }
-
-    let problemData = await db.collection('problem').findOne({_id: new ObjectId(dataSet.problemId)})
-    let userData = await db.collection('user').findOne({_id: new ObjectId(dataSet.userId)})
-
-    let userSolvedData = userData.clear.split(',')
+});
 
 
-    console.log(problemData)
-    console.log(userData)
-
-    let result = await chatgptScore(dataSet.code, problemData.testCase, problemData.answerTable)
-
-    if (result[0]==='1') {
-        console.log("정답 입력됨")
-        await db.collection('user').updateOne({_id: new ObjectId(userData._id)},{
-            $set: {clearCount: (userData.clearCount+1), clear: userData.clear + `${problemData.number}`}
-        })
-        await db.collection('problem').updateOne({_id: new ObjectId(problemData._id)}, {
-            $set: {clearCount: (problemData.clearCount+1)}
-        })
-    } else {
-        console.log("정답이 아닌것이 입력됨")
-    }
-
-    console.log(result)
-    res.send('처리 완료')
-})
 
 app.post('/createProblem', async (req, res) => {
     inputData = {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>ALZalz | problem</title>
         <meta charset="utf-8">
         <link rel="stylesheet" href="/css/baseCss.css">
         <link rel="stylesheet" href="/css/problemSolve.css">
@@ -17,13 +17,13 @@
                 display: flex;
                 justify-content: space-between;
             }
+            
         </style>
         <%- include('blockHeader.ejs') %>
 
 
         <div id="base-main">
             <div class="side-bar">
-                this is side bar
             </div>
             <div class="main">
                 <div class="jumbo"><h2>문제</h2></div>
@@ -36,16 +36,24 @@
                         <%- dataSet.content.replace(/\n/g, '<br>') %>
                     </div>
                     <div class="explain">
-                        <h4>입력 설명</h4>
-                        <%= JSON.stringify(dataSet.inputExplain) %>
-                        <h4>출력 설명</h4>
-                        <%= JSON.stringify(dataSet.outputExplain) %>
+                        <div>
+                            <h4>입력 설명</h4>
+                            <%= JSON.stringify(dataSet.inputExplain) %>
+                        </div>
+                        <div>
+                            <h4>출력 설명</h4>
+                            <%= JSON.stringify(dataSet.outputExplain) %>
+                        </div>
                     </div>
                     <div class="sample">
-                        <h4>입력 예제</h4>
-                        <%= JSON.stringify(dataSet.sampleInput) %>
-                        <h4>출력 예제</h4>
-                        <%= JSON.stringify(dataSet.sampleOutput) %>
+                        <div>
+                            <h4>입력 예제</h4>
+                            <%= JSON.stringify(dataSet.sampleInput) %>
+                        </div>
+                        <div>
+                            <h4>출력 예제</h4>
+                            <%= JSON.stringify(dataSet.sampleOutput) %>
+                        </div>
                     </div>
 
                     <form class="form-box" action="/problemSumit" method="POST">

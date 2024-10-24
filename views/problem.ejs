@@ -1,37 +1,53 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title></title>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="/css/baseCss.css">
-        <link rel="stylesheet" href="/css/problemList.css">
-    </head>
-    <body>
+<head>
+    <title>ALZalz | problemList</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/css/baseCss.css">
+    <link rel="stylesheet" href="/css/problemList.css">
+</head>
+<body>
 
+    <%- include('blockHeader.ejs') %>
 
-        <%- include('blockHeader.ejs') %>
-
-
-        <div id="base-main">
-            <div class="side-bar">
-                this is side bar
-            </div>
-            <div class="main">
-                <div class="jumbo"><h2>문제 리스트</h2></div>
-                <div class="container">
-                    <ul class="problemList">
-                        <% for(let i=0; i<dataSet.length; i++) { %>
-                            <li class="list-box"><a href="/problem/<%= dataSet[i]._id %>">
-                                <%= JSON.stringify(dataSet[i].number) %>
-                                <%= JSON.stringify(dataSet[i].title) %>
+    <div id="base-main">
+        <div class="side-bar">
+        </div>
+        <div class="main">
+            <div class="jumbo"><h2>문제 리스트</h2></div>
+            <div class="container">
+                <ul class="problemList"><strong>
+                    <% 
+                    // userData.wrong 및 userData.clear가 undefined일 경우 빈 배열로 초기화
+                    const wrongProblems = userData.wrong || [];
+                    const clearedProblems = userData.clear || [];
+                    
+                    for(let i = 0; i < dataSet.length; i++) { 
+                        let isWrong = wrongProblems.indexOf(dataSet[i].number);
+                        let isClear = clearedProblems.indexOf(dataSet[i].number);
+                    %>
+                        <% if (isWrong !== -1) { %>
+                            <li class="wrongProblem"><a href="/problem/<%= dataSet[i]._id %>">
+                                <%= dataSet[i].number %> <!-- JSON.stringify() 제거 -->
+                                <%= dataSet[i].title %>
+                            </a></li>
+                        <% } else if (isClear !== -1) { %>
+                            <li class="clearProblem"><a href="/problem/<%= dataSet[i]._id %>">
+                                <%= dataSet[i].number %> <!-- JSON.stringify() 제거 -->
+                                <%= dataSet[i].title %>
+                            </a></li>
+                        <% } else { %>
+                            <li class="default"><a href="/problem/<%= dataSet[i]._id %>"> <!-- 'defalt' 오타 수정 -->
+                                <%= dataSet[i].number %> <!-- JSON.stringify() 제거 -->
+                                <%= dataSet[i].title %>
                             </a></li>
                         <% } %>
-                    </ul>
-                </div>
+                    <% } %> <!-- for 루프의 종료 -->
+                </strong></ul>
             </div>
         </div>
+    </div>
 
-
-        <%- include('blockFooter.ejs') %>
-    </body>
+    <%- include('blockFooter.ejs') %>
+</body>
 </html>

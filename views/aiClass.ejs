@@ -1,22 +1,38 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>ALZalz | aiClass</title>
         <meta charset="utf-8">
         <link rel="stylesheet" href="/css/baseCss.css">
     </head>
     <body>
+        <style>
+            .list-box {
+                font-size: 20px;
+                background-color: #ffffff; /* 리스트 아이템 배경색 */
+                border: 1px solid #ccc; /* 테두리 */
+                border-radius: 5px; /* 둥근 모서리 */
+                margin: 10px 0; /* 위아래 여백 */
+                padding: 15px; /* 내부 여백 */
+                transition: background-color 0.3s; /* 배경색 변화 애니메이션 */
+            }
+
+            /* 리스트 아이템 호버 효과 */
+            .list-box:hover {
+                background-color: #e9ecef; /* 호버 시 배경색 변화 */
+            }
+        </style>
+
         <%- include('blockHeader.ejs') %>
 
 
         <div id="base-main">
             <div class="side-bar">
-                this is side bar
             </div>
             <div class="main">
                 <div class="jumbo"><h2>AI Class</h2></div>
                 <div class="container">
-                    <ul>
+                    <ul class="list-box">
                         <a href="aiCreater"><li class="choseOnes">
                             <div class="contentName"><strong>문제 생성하기</strong></div>
                             <div></div>

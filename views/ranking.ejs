@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>ALZalz | rank</title>
         <meta charset="utf-8">
         <link rel="stylesheet" href="/css/baseCss.css">
         <link rel="stylesheet" href="/css/ranking.css">
@@ -12,23 +12,23 @@
 
         <div id="base-main">
             <div class="side-bar">
-                this is side bar
             </div>
             <div class="main">
                 <div class="jumbo"><h2>랭킹</h2></div>
                 <div class="container">
                     <ul class="peopleDatas" style="padding: 0px;">
                         <% for(let i=0; i<peoplesData.length; i++) { %>
+                            <a href="/content">
                             <li>
                                 <strong style="display: flex; justify-content: space-between;">
                                     <div class="name">
-                                        <%= JSON.stringify(peoplesData[i].username) %> 
+                                        <%= peoplesData[i].username %> 
                                     </div>
                                     <div class="user_info">
                                         <%= JSON.stringify(peoplesData[i].clearCount) %> 
                                     </div>
                                 </strong>
-                            </li>
+                            </li></a>
                         <% } %>
                     </ul>
                     
