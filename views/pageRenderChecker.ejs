@@ -48,15 +48,15 @@
                     </div>
                     <h3>생성여부</h3>
                     <form class="form-box" action="/problemRenderSumit" method="POST">
-                        <input name="title" value="<%= dataSet.title %>">
-                        <input name="content" value="<%= dataSet.content %>">
-                        <input name="inputExplain" value="<%= dataSet.inputExplain %>">
-                        <input name="outputExplain" value="<%= dataSet.outputExplain %>">
-                        <input name="sampleInput" value="<%= dataSet.sampleInput %>">
-                        <input name="sampleOutput" value="<%= dataSet.sampleOutput %>">
-                        <input name="testCase" value="<%= dataSet.testCase%>">
-                        <input name="answerTable" value="<%= dataSet.answerTable %>">
-                        <input name="createrId" value="<%= userData._id %>">
+                        <input name="title" value="<%= dataSet.title %>" style="display: none;">
+                        <input name="content" value="<%= dataSet.content %>"style="display: none;">
+                        <input name="inputExplain" value="<%= dataSet.inputExplain %>"style="display: none;">
+                        <input name="outputExplain" value="<%= dataSet.outputExplain %>"style="display: none;">
+                        <input name="sampleInput" value="<%= dataSet.sampleInput %>"style="display: none;">
+                        <input name="sampleOutput" value="<%= dataSet.sampleOutput %>"style="display: none;">
+                        <input name="testCase" value="<%= dataSet.testCase%>"style="display: none;">
+                        <input name="answerTable" value="<%= dataSet.answerTable %>"style="display: none;">
+                        <input name="createrId" value="<%= userData._id %>"style="display: none;">
                         <button type="submit">생성</button>
                     </form>
                     <form class="cancel" action="/cancel" method="POST">

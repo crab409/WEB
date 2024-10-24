@@ -51,7 +51,7 @@
                     <form class="form-box" action="/problemSumit" method="POST">
                         <h4>문제 답란</h4>
                         
-                        <input id="code" name="code"></textarea>
+                        <textarea id="code" name="code"rows="10" onkeydown="preventSubmit(event)" style="width: 100%;"></textarea>
                         <input name="id" value="<%= userData._id %>" style="display: none;">
                         <input name="problemId" value="<%= dataSet._id %>" style="display: none;">
                         <button type="submit">전송</button>
