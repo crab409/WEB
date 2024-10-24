@@ -24,11 +24,11 @@
                 <div class="container">
                     <div class="state">
                         <h2>lv. Nan</h2>
-                        <p>흔적기관임 무시하셈</p>
+                        <p>흔적기관, 추후 수정 예정</p>
                     </div> 
                     <div class="notice">
                         <h2>공지</h2>
-                        <p>
+                        <p class="notice-set">
                             <% for(let i=0; ((i<noticeData.length) && (i<4)); i++) { %>
                                 <p><strong><%= JSON.stringify(noticeData[i].title ) %></strong></p>
                                 <p><%= JSON.stringify(noticeData[i].content ) %> </p>

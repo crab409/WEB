@@ -550,8 +550,8 @@ answerTable: ${newProblemDataSet.answerTable}
 
 //링크 입력하면 해당 자료 보내주는 코드
 app.get('/', async (req, res) => {
-    let result = await testChat("다람쥐 챗바퀴 타고파")
-    console.log(result)
+    //let result = await testChat("다람쥐 챗바퀴 타고파")
+    //console.log(result)
 
     let userData = undefined
     if (req.user==undefined) {
@@ -657,23 +657,21 @@ app.get('/aiClass', (requ, resp) => {
     resp.render('aiClass.ejs', {userData: userData})
 })
 
-app.get('/account', (requ, resp) => {
+app.get('/account', async (req, res) => {
 
     let userData = undefined
-    if (requ.user==undefined) {
+    if (req.user==undefined) {
         userData = null
-    } else if (requ.user != undefined){ 
-        userData = {
-            id: requ.user.id,
-            username: requ.user.username
-        }
+    } else if (req.user != undefined){ 
+        userData = await db.collection('user').findOne({_id: new ObjectId(req.user.id)})
+        console.log(userData)
     }   
 
     if(!userData) {
-        resp.render('pageLogin.ejs', {userData: userData})
+        res.render('pageLogin.ejs', {userData: userData})
 
     } else { 
-        resp.render('account.ejs', {userData: userData})
+        res.render('account.ejs', {userData: userData})
 
     }
 })
@@ -799,8 +797,8 @@ app.post('/createProblem', async (req, res) => {
 
 app.post('/problemRenderSumit', async (req, res) => {
     let problemList = await db.collection('problem').find().toArray()
-    let newNumber = await problemList[problemList.length-1] + 1;
-
+    let newNumber = await problemList[problemList.length-1].number + 1;
+    console.log(newNumber)
     newProblemDataSet = {
         number: newNumber,
         title: req.body.title,

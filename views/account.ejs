@@ -15,7 +15,11 @@
             <div class="main">
                 <div class="jumbo"><h2>Profile</h2></div>
                 <div class="container">
-                    <form class="form-box" action="/logOut" method="POST">
+                    <h1><%= JSON.stringify(userData.username) %></h1>
+
+                    <h2 style="margin: 0px;">푼 문제</h2>
+                    <%= JSON.stringify(userData.clear) %>
+                    <form class="form-box" action="/logOut" method="POST" style="margin-top: 4%;">
                         <button type="submit">로그아웃</button>
                     </form> 
                 </div>

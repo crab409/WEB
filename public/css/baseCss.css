@@ -101,6 +101,10 @@ ul {
     color: aliceblue;
 }
 
+#base-main .container { 
+    padding: 30px;  
+}
+
 #base-footer {
     background-color: rgb(226, 226, 226);
     padding-bottom: 30%;
